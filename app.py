@@ -15,6 +15,28 @@ cred=credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred,{
     "databaseURL":"https://sih-tech810-default-rtdb.firebaseio.com/"
 })
+class Student:
+    def __init__(self,key,value):
+        self.attendance=value['attendance']
+        self.fees_pending=value['fees_pending']
+        self.family_income=value['family_income']
+        self.kt=value['kt']
+        self.key=key
+        self.risk=""
+        self.total_marks=0
+        for mark in value['marks'].values():
+            self.total_marks=self.total_marks+mark
+        self.exam_score=self.total_marks/400 * 100
+
+    def predict_risk(self):
+            student_data=pd.DataFrame([[self.attendance,self.exam_score , self.fees_pending, self.family_income, self.kt]],columns=['attendance', 'exam_score', 'fees_pending', 'family_income', 'backlogs'])
+            self.risk=risk_labels[model.predict(student_data)[0]]
+    def update_db(self):
+            ref = db.reference(f'students/{self.key}')
+            ref.update({
+            "risk_status":self.risk,
+        })
+
 
 
 
@@ -24,15 +46,7 @@ risk_labels = {0: 'Low Risk', 1: 'Medium Risk', 2: 'High Risk'}
 @app.route('/')
 def home():
     return "heo"
-@app.route('/add')
-def add():
-    ref=db.reference('students')
-    new_student_ref = ref.push({
-    'name': 'Kartik',
-    'attendance': 75,
-    'kt': 1
-   })
-    return "Data inserted"
+
 @app.route('/predict')
 def predict():
     ref=db.reference('students')
@@ -41,25 +55,13 @@ def predict():
         values = data.items()
     elif isinstance(data, list):
         values = [(i, item) for i, item in enumerate(data) if item is not None]
-
     else:
         values = []
     for key,value in values:
-        total_marks=0
-        for mark in value['marks'].values():
-            total_marks=total_marks+mark
-        exam_score=total_marks/400 * 100
-        attendance=value['attendance']
-        family_income=value['family_income']
-        fees_pending=value['fees_pending']
-        kt=value['kt']
-        student_data=pd.DataFrame([[attendance, exam_score , fees_pending, family_income, kt]],columns=['attendance', 'exam_score', 'fees_pending', 'family_income', 'backlogs'])
-        risk=risk_labels[model.predict(student_data)[0]]
-        ref = db.reference(f'students/{key}')  # replace with actual student key
-        ref.update({
-        "risk_status":risk,
-        "risk":None
-       })
+        s=Student(key,value)
+        s.predict_risk()
+        print(s.risk)
+
 
 
 
