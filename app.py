@@ -24,6 +24,7 @@ firebase_admin.initialize_app(cred,{
 })
 class Student:
     def __init__(self,key,value):
+        self.name=value['name']
         self.attendance=value['attendance']
         self.fees_pending=value['fees_pending']
         self.family_income=value['family_income']
@@ -34,7 +35,7 @@ class Student:
         for mark in value['marks'].values():
             self.total_marks=self.total_marks+mark
         self.exam_score=self.total_marks/(len(value['marks'])*100) * 100
-        print(self.exam_score)
+        print(self.name,self.exam_score)
 
     def predict_risk(self):
             student_data=pd.DataFrame([[self.attendance,self.exam_score , self.fees_pending, self.family_income, self.kt]],columns=['attendance', 'exam_score', 'fees_pending', 'family_income', 'backlogs'])
