@@ -8,8 +8,8 @@ from firebase_admin import credentials,db
 from flask_cors import CORS 
 import requests
 app=Flask("__name__")
-
-CORS(app, resources={r"/*": {"origins": r"http://localhost:3000+"}}, supports_credentials=True)
+CORS(app,origins='*')
+# CORS(app, resources={r"/*": {"origins": r"http://localhost:3000+"}}, supports_credentials=True)
 
 
 model=pickle.load(open("D:/SIH Hackathon Backend/backend/student_dropout_model_3levels.pkl","rb"))
