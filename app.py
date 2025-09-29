@@ -12,7 +12,7 @@ CORS(app,origins='*')
 # CORS(app, resources={r"/*": {"origins": r"http://localhost:3000+"}}, supports_credentials=True)
 
 
-model=pickle.load(open("D:/SIH Hackathon Backend/backend/student_dropout_model_3levels.pkl","rb"))
+model=pickle.load(open("student_dropout_model_3levels.pkl","rb"))
 
 
 base_dir=os.path.dirname(os.path.abspath(__file__))
